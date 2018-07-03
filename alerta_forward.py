@@ -18,10 +18,11 @@ SMS_URL = os.environ.get(
 
 class ForwardAlert(PluginBase):
     
-    def _sms_prepare_payload(self, alert, status=None, text=None):
-        summary = "*[%s] %s %s - _%s on %s_* " % (
+    def _slack_prepare_payload(self, alert, status=None, text=None):
+        summary = "*[%s] %s %s - _%s on %s_* <%s/#/alert/%s|%s>" % (
             (status if status else alert.status).capitalize(), alert.environment, alert.severity.capitalize(
-            ), alert.event, alert.resource)
+            ), alert.event, alert.resource, SMS_URL,
+            alert.id, alert.get_id(short=True)
         )
 
         payload = {
