@@ -26,7 +26,13 @@ class ForwardAlert(PluginBase):
         )
 
         payload = {
-            "text": summary
+            "tstamp_cmk": alert.create_time,
+            "from_host" : alert.customer,
+            "monitor_host" : alert.platform,
+            "service" : alert.service,
+            "service_state" : alert.severity.capitalize(),
+            "info" : alert.text,
+            "status_alarm" : summary
         }
 
         return payload
