@@ -1,7 +1,8 @@
 
-import os
+import json
 import logging
-
+import os
+import requests
 from alerta.plugins import PluginBase
 from alertaclient.api import Client
 
@@ -12,27 +13,37 @@ except ImportError:
 
 LOG = logging.getLogger('alerta.plugins.forward')
 
-FORWARD_URL = os.environ.get(
-    'FORWARD_URL') or app.config.get('FORWARD_URL')
-FORWARD_API_KEY = os.environ.get(
-    'FORWARD_API_KEY') or app.config.get('FORWARD_API_KEY')
-FORWARD_MAX_LENGTH = os.environ.get(
-    'FORWARD_MAX_LENGTH') or app.config.get('FORWARD_MAX_LENGTH') or 3
+SMS_URL = os.environ.get(
+    'SMS_URL') or app.config.get('SMS_URL')
 
 class ForwardAlert(PluginBase):
+    
+    def _sms_prepare_payload(self, alert, status=None, text=None):
+        summary = "*[%s] %s %s - _%s on %s_* " % (
+            (status if status else alert.status).capitalize(), alert.environment, alert.severity.capitalize(
+            ), alert.event, alert.resource)
+        )
+
+        payload = {
+            "text": summary
+        }
+
+        return payload
 
     def pre_receive(self, alert):
         return alert
 
     def post_receive(self, alert):
-        if not FORWARD_URL or not FORWARD_API_KEY:
-            return
-        client = Client(endpoint=FORWARD_URL, key=FORWARD_API_KEY)
+        payload = self._sms_prepare_payload(alert)
 
-        client.send_alert(
-            **alert.serialize
-        )
-        return
+        LOG.info('sms payload: %s', payload)
+
+        try:
+            r = requests.post(SMS_URL,data=json.dumps(payload), timeout=2)
+        except Exception as e:
+            raise RuntimeError("sms connection error: %s", e)
+
+        LOG.info('sms response: %s', r.status_code)
 
     def status_change(self, alert, status, text):
         return
