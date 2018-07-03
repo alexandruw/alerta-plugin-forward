@@ -28,8 +28,9 @@ class ForwardAlert(PluginBase):
         payload = {
             "tstamp_cmk": alert.create_time,
             "from_host" : alert.attributes['ip'],
-            "monitor_host" : alert.attributes['platform'],
-            "service" : alert.attributes['service'],
+            "monitor_host" : alert.customer,
+            "platform" : alert.service,
+            "service" : alert.attributes['object'],
             "service_state" : alert.severity.capitalize(),
             "info" : alert.text,
             "status_alarm" : summary
