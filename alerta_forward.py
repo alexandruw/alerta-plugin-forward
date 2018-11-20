@@ -33,6 +33,7 @@ class ForwardAlert(PluginBase):
             "service" : alert.resource,
             "service_state" : alert.severity.capitalize(),
             "info" : alert.text,
+            "raw_data" : alert.raw_data,
             "status_alarm" : summary
         }
 
