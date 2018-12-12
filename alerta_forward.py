@@ -1,4 +1,3 @@
-
 import json
 import logging
 import os
@@ -17,7 +16,7 @@ SMS_URL = os.environ.get(
     'SMS_URL') or app.config.get('SMS_URL')
 
 class ForwardAlert(PluginBase):
-    
+
     def _sms_prepare_payload(self, alert, status=None, text=None):
         summary = "*[%s] %s %s - _%s on %s_* <%s/#/alert/%s|%s>" % (
             (status if status else alert.status).capitalize(), alert.environment, alert.severity.capitalize(
@@ -33,6 +32,7 @@ class ForwardAlert(PluginBase):
             "service" : alert.resource,
             "service_state" : alert.severity.capitalize(),
             "info" : alert.text,
+            "alarm_id" : alert.id,
             "raw_data" : alert.raw_data,
             "status_alarm" : summary
         }
@@ -56,3 +56,4 @@ class ForwardAlert(PluginBase):
 
     def status_change(self, alert, status, text):
         return
+    
