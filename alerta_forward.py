@@ -48,7 +48,7 @@ class ForwardAlert(PluginBase):
         LOG.info('sms payload: %s', payload)
 
         try:
-            r = requests.post(SMS_URL,data=json.dumps(payload), timeout=5)
+            r = requests.post(SMS_URL,data=json.dumps(payload), timeout=10)
         except Exception as e:
             raise RuntimeError("sms connection error: %s", e)
 
